@@ -46,35 +46,28 @@ pub fn calculate_similarity(input: String) -> u64 {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
-    #[test]
-    fn difference_passes() {
-        let input = "3   4
+    const INPUT: &str = "3   4
 4   3
 2   5
 1   3
 3   9
-3   3"
-            .to_string();
+3   3";
+
+    #[test]
+    fn difference_passes() {
         let want = 11;
-        let result = calculate_distance(input);
+        let result = calculate_distance(INPUT.to_string());
 
         assert_eq!(result, want)
     }
 
     #[test]
     fn similarity_passes() {
-        let input = "3   4
-4   3
-2   5
-1   3
-3   9
-3   3"
-            .to_string();
         let want = 31;
-        let result = calculate_similarity(input);
+        let result = calculate_similarity(INPUT.to_string());
 
         assert_eq!(result, want)
     }
