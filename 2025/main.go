@@ -1,15 +1,17 @@
 package main
 
-import (
-	"log"
-	"os"
+import aoc2025 "github.com/dem4gus/advent-of-code/2025/pkg"
 
-	day01 "github.com/dem4gus/advent-of-code/2025/pkg"
-)
+type daySolver interface {
+	Run()
+}
 
 func main() {
-	errLog := log.New(os.Stderr, "error: ", log.LstdFlags|log.Lmsgprefix|log.Llongfile)
+	problems := []daySolver{
+		&aoc2025.Day01{},
+	}
 
-	day01.ProblemOne(errLog)
-	day01.ProblemTwo(errLog)
+	for _, d := range problems {
+		d.Run()
+	}
 }

@@ -1,4 +1,4 @@
-package day01
+package aoc2025
 
 import (
 	"bufio"
@@ -8,72 +8,43 @@ import (
 	"strconv"
 )
 
-func ProblemOne(l *log.Logger) {
-	dialPos := 50
-	var password int
+type Day01 struct{}
 
-	f, err := os.Open("inputs/day01.txt")
-	if err != nil {
-		l.Println(err)
-		return
+type rotations []int
+
+func (d *Day01) Run() {
+	fmt.Println("Day One")
+	fmt.Println("------------")
+
+	if rot := readFile("inputs/day01.txt"); rot != nil {
+		rot.stepOne()
+		rot.stepTwo()
 	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		dir := line[0]
-		ticks, err := strconv.Atoi(line[1:])
-		if err != nil {
-			l.Println(err)
-			return
-		}
-		delta := ticks % 100
-		if dir == 'L' {
-			delta *= -1
-		}
-
-		intermediatePos := dialPos + delta
-		if intermediatePos%100 == 0 {
-			password += 1
-		}
-		dialPos = (intermediatePos + 100) % 100
-	}
-
-	fmt.Printf("Part 1: %d\n", password)
 }
 
-func ProblemTwo(l *log.Logger) {
+func (rot *rotations) stepOne() {
 	dialPos := 50
 	var password int
 
-	f, err := os.Open("inputs/day01.txt")
-	if err != nil {
-		l.Println(err)
-		return
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-
-	lineNumber := 0
-	for scanner.Scan() {
-		line := scanner.Text()
-		lineNumber += 1
-		dir := line[0]
-		ticks, err := strconv.Atoi(line[1:])
-		if err != nil {
-			l.Println(err)
-			return
+	for _, ticks := range *rot {
+		dialPos += ticks
+		if dialPos%100 == 0 {
+			password += 1
 		}
+	}
+
+	fmt.Println("Part 1:", password)
+}
+
+func (rot *rotations) stepTwo() {
+	dialPos := 50
+	var password int
+
+	for _, ticks := range *rot {
 		// add one every time the dial passes 0
-		password += ticks / 100
+		password += abs(ticks / 100)
 
 		delta := ticks % 100
-		if dir == 'L' {
-			delta *= -1
-		}
 		finalPos := dialPos + delta
 
 		// check for passing or landing on 0 one more time
@@ -84,4 +55,45 @@ func ProblemTwo(l *log.Logger) {
 	}
 
 	fmt.Printf("Part 2: %d\n", password)
+}
+
+func readFile(file string) *rotations {
+	e := log.New(os.Stderr, "error: ", log.LstdFlags|log.Lmsgprefix|log.Llongfile)
+	var data rotations
+
+	f, err := os.Open(file)
+	if err != nil {
+		e.Println(err)
+		return nil
+	}
+
+	defer func(f *os.File) {
+		if err := f.Close(); err != nil {
+			e.Println(err)
+		}
+	}(f)
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		dir := line[0]
+		ticks, err := strconv.Atoi(line[1:])
+		if err != nil {
+			e.Println(err)
+			return nil
+		}
+		if dir == 'L' {
+			ticks *= -1
+		}
+		data = append(data, ticks)
+	}
+
+	return &data
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
